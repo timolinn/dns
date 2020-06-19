@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -13,16 +14,30 @@ import (
 	"github.com/timolinn/dns/cmd/api/handlers"
 )
 
+var addr string
+var readtimeout, writetimeout time.Duration
+
 func main() {
+	flag.StringVar(&addr, "host", ":8080", "define server address")
+	flag.DurationVar(&readtimeout, "read timeout", 5, "sets the read timeout in seconds")
+	flag.DurationVar(&writetimeout, "write timeout", 10, "sets the write timeout in seconds")
+
 	logger := log.New(os.Stdout, "DNS : ", log.LstdFlags|log.Lmicroseconds|log.Lshortfile)
+	if err := run(logger); err != nil {
+		logger.Println(err)
+		os.Exit(1)
+	}
+}
+
+func run(logger *log.Logger) error {
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	server := &http.Server{
-		Addr:         ":8080",
+		Addr:         addr,
 		Handler:      handlers.Register(shutdown, logger),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  readtimeout * time.Second,
+		WriteTimeout: writetimeout * time.Second,
 		ErrorLog:     logger,
 	}
 
@@ -31,14 +46,14 @@ func main() {
 
 	// start our server
 	go func() {
-		log.Println("starting server...")
+		log.Println("started running")
 		serverErr <- server.ListenAndServe()
 	}()
 
 	select {
 	case err := <-serverErr:
-		log.Println(errors.Wrap(err, "server error"))
-		os.Exit(1)
+		return errors.Wrap(err, "server error")
+
 	case sig := <-shutdown:
 		log.Printf("main %v: Start service shutdown", sig)
 
@@ -47,7 +62,8 @@ func main() {
 
 		if err := server.Shutdown(ctx); err != nil {
 			server.Close()
-			logger.Println(errors.Wrap(err, "could not stop server gracefully"))
+			return errors.Wrap(err, "could not stop server gracefully")
 		}
 	}
+	return nil
 }
