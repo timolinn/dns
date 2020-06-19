@@ -21,6 +21,7 @@ func main() {
 	flag.StringVar(&addr, "host", ":8080", "define server address")
 	flag.DurationVar(&readtimeout, "read timeout", 5, "sets the read timeout in seconds")
 	flag.DurationVar(&writetimeout, "write timeout", 10, "sets the write timeout in seconds")
+	flag.Parse()
 
 	logger := log.New(os.Stdout, "DNS : ", log.LstdFlags|log.Lmicroseconds|log.Lshortfile)
 	if err := run(logger); err != nil {

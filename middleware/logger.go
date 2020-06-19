@@ -24,7 +24,7 @@ func Logger(logger *log.Logger) web.Middleware {
 				429,
 				r.Method, r.URL.Path,
 				r.RemoteAddr,
-				time.Since(time.Now()),
+				time.Since(time.Now()), // use time data from context
 			)
 			return err
 		}

@@ -14,8 +14,8 @@ type FieldError struct {
 }
 
 type ErrorResponse struct {
-	Error  string `json:"error"`
-	Fields []FieldError
+	Error  string       `json:"error"`
+	Fields []FieldError `json:"fields"`
 }
 
 func NewRequestError(err error, statusCode int) error {

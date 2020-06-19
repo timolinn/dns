@@ -70,8 +70,8 @@ func Decode(r *http.Request, val interface{}) error {
 		}
 
 		return &Error{
-			Err:    errors.New("field validation error"),
-			Status: http.StatusBadRequest,
+			Err:    errors.New("validation error"),
+			Status: http.StatusUnprocessableEntity,
 			Fields: fields,
 		}
 	}

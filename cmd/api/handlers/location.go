@@ -16,7 +16,7 @@ func Locate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return web.RespondError(ctx, w, err)
 	}
-	systemType := System(r.Header["X-System-Type"][0])
+	systemType := System(r.Header.Get("X-System-Type"))
 
 	system := NewSectorNavigator()
 	result, err := system.Solve(data, systemType)

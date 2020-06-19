@@ -14,12 +14,12 @@ type System string
 
 const (
 	Drone      System = "drone"
-	Ship              = "vessel"
+	Ship              = "ship"
 	UltraDrone        = "ultradrones"
 )
 
 var (
-	ErrUnknownSystemType = errors.New("invalid system type: requires 'drone', 'vessel' or 'ultradrone'")
+	ErrUnknownSystemType = errors.New("invalid system type: requires 'drone', 'ship' or 'ultradrone'")
 )
 
 // CoordsVelocity expected request data
