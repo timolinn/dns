@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 
-RUN apk update && apk add --no-cache git
+RUN apk update && apk add --no-cache git && apk add ca-certificates
 
 ENV USER=appuser
 ENV UID=10001
@@ -27,6 +27,7 @@ RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/dns ./api/cmd
 FROM scratch
 
 # Import the user and group files from the builder.
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
