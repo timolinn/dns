@@ -13,7 +13,7 @@ import (
 	"github.com/timolinn/dns/pkg/web"
 )
 
-func TestLocation(t *testing.T) {
+func TestLocate(t *testing.T) {
 	var payload = []byte(`{"x":"123.12","z":"789.89","y":"456.56", "vel":"20.0"}`)
 	var badPayload = []byte(`{"x":"123,12","z":"789.89","y":"456.56", "vel":"20.0"}`)
 	var incompletePayload = []byte(`{"x":"123.12","z":"789.89"}`)
@@ -78,20 +78,20 @@ func TestLocation(t *testing.T) {
 		if result.StatusCode != http.StatusUnprocessableEntity {
 			t.Errorf("Should receive status code %d, got %d", http.StatusUnprocessableEntity, result.StatusCode)
 		}
-		type got struct {
+		type response struct {
 			Error  string           `json:"error"`
 			Fields []web.FieldError `json:"fields"`
 		}
-		g := got{}
-		if err := json.NewDecoder(result.Body).Decode(&g); err != nil {
+		got := response{}
+		if err := json.NewDecoder(result.Body).Decode(&got); err != nil {
 			t.Errorf("should be able to unmarshal response")
 		}
 
-		if g.Error != "validation error" {
-			t.Errorf("want %s, got %s", "validation error", g.Error)
+		if got.Error != "validation error" {
+			t.Errorf("want %s, got %s", "validation error", got.Error)
 		}
 
-		if g.Fields == nil {
+		if got.Fields == nil {
 			t.Errorf("missing fields should specified")
 		}
 	})
@@ -107,6 +107,33 @@ func TestLocation(t *testing.T) {
 		result := w.Result()
 		if result.StatusCode != http.StatusBadRequest {
 			t.Errorf("Should receive status code %d, got %d", http.StatusBadRequest, result.StatusCode)
+		}
+	})
+
+	t.Run("should fail for unsupported systemType", func(t *testing.T) {
+		buf := bytes.NewReader(payload)
+		r := httptest.NewRequest(http.MethodPost, "/v1/locate", buf)
+		w := httptest.NewRecorder()
+		r.Header.Set("X-System-Type", "unknown")
+		app := handlers.Register(shutdown, logger)
+		app.ServeHTTP(w, r)
+
+		result := w.Result()
+		if result.StatusCode != http.StatusBadRequest {
+			t.Errorf("Should receive status code %d, got %d", http.StatusBadRequest, result.StatusCode)
+		}
+
+		type response struct {
+			Error  string           `json:"error"`
+			Fields []web.FieldError `json:"fields"`
+		}
+		got := response{}
+		if err := json.NewDecoder(result.Body).Decode(&got); err != nil {
+			t.Errorf("should be able to unmarshal response")
+		}
+		msg := "invalid system type: requires 'drone', 'ship' or 'ultradrone'"
+		if got.Error != msg {
+			t.Errorf("should return correct error message: want=%s, got=%s", msg, got.Error)
 		}
 	})
 
@@ -141,15 +168,15 @@ func TestLocation(t *testing.T) {
 		type response struct {
 			Loc float64 `json:"loc"`
 		}
-		wt := response{}
-		gt := response{}
-		json.NewDecoder(bytes.NewReader(success)).Decode(&wt)
-		if err := json.NewDecoder(result.Body).Decode(&gt); err != nil {
+		want := response{}
+		got := response{}
+		json.NewDecoder(bytes.NewReader(success)).Decode(&want)
+		if err := json.NewDecoder(result.Body).Decode(&got); err != nil {
 			t.Errorf("should be able to unmarshal response")
 		}
 
-		if gt.Loc != wt.Loc {
-			t.Errorf("want %v, got %v", wt.Loc, gt.Loc)
+		if got.Loc != want.Loc {
+			t.Errorf("want %v, got %v", want.Loc, got.Loc)
 		}
 	})
 
@@ -166,15 +193,15 @@ func TestLocation(t *testing.T) {
 		type response struct {
 			Location float64 `json:"location"`
 		}
-		wt := response{}
-		gt := response{}
-		json.NewDecoder(bytes.NewReader(successShip)).Decode(&wt)
-		if err := json.NewDecoder(result.Body).Decode(&gt); err != nil {
+		want := response{}
+		got := response{}
+		json.NewDecoder(bytes.NewReader(successShip)).Decode(&want)
+		if err := json.NewDecoder(result.Body).Decode(&got); err != nil {
 			t.Errorf("should be able to unmarshal response")
 		}
 
-		if gt.Location != wt.Location {
-			t.Errorf("want %v, got %v", wt.Location, gt.Location)
+		if got.Location != want.Location {
+			t.Errorf("want %v, got %v", want.Location, got.Location)
 		}
 	})
 }
