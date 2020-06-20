@@ -1,6 +1,10 @@
 package handlers_test
 
 import (
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
 
@@ -50,5 +54,20 @@ func TestResponse(t *testing.T) {
 				t.Errorf("SectorNavigator.Solve(): want=%v :: got=%v", test.out, res)
 			}
 		})
+	}
+}
+
+func TestHome(t *testing.T) {
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+	shutdown := make(chan os.Signal, 1)
+	logger := log.New(os.Stdout, "TEST : ", log.LstdFlags|log.Lmicroseconds|log.Lshortfile)
+
+	app := handlers.Register(shutdown, logger)
+	app.ServeHTTP(w, r)
+
+	result := w.Result()
+	if result.StatusCode != http.StatusOK {
+		t.Errorf("should return correct status code: want=%v, got=%v", http.StatusOK, result.StatusCode)
 	}
 }

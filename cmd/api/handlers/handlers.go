@@ -1,3 +1,5 @@
+// Package handlers defines the HTTP request handlers and
+// registers them in our web App
 package handlers
 
 import (
@@ -6,7 +8,6 @@ import (
 	"os"
 
 	"github.com/timolinn/dns/middleware"
-
 	"github.com/timolinn/dns/pkg/web"
 )
 
@@ -14,7 +15,8 @@ import (
 func Register(shutdown chan os.Signal, log *log.Logger) http.Handler {
 	app := web.NewApp(shutdown, middleware.Logger(log))
 
-	app.MountHandler(http.MethodPost, "/v1/locate", Locate)
+	app.MountHandler(http.MethodGet, "/", home)
+	app.MountHandler(http.MethodPost, "/v1/locate", locate)
 
 	return app
 }

@@ -14,6 +14,8 @@ import (
 	"github.com/timolinn/dns/cmd/api/handlers"
 )
 
+var version = "develop"
+
 var addr string
 var readtimeout, writetimeout time.Duration
 

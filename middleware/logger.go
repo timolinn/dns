@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -11,20 +12,25 @@ import (
 
 // Logger logs arbitrary data
 func Logger(logger *log.Logger) web.Middleware {
-	// define actual middleware
+	// actual middleware
 	mid := func(f web.Handler) web.Handler {
-		// define handler
+		// define web Handler
 		h := func(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
-			// start span
+			// start tracer span
+
+			v, ok := ctx.Value(web.KeyValues).(*web.Values)
+			if !ok {
+				return errors.New("web value missing from context")
+			}
 
 			err := f(ctx, w, r)
 
 			logger.Printf("%s : (%d) : %s %s -> %s (%s)",
-				"unique-trace-id",
-				429,
+				"unique-trace-id", // TODO: use uuids for unique ID for tracing
+				v.StatusCode,
 				r.Method, r.URL.Path,
 				r.RemoteAddr,
-				time.Since(time.Now()), // use time data from context
+				time.Since(v.Now),
 			)
 			return err
 		}

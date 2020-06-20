@@ -4,11 +4,23 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+
+	"github.com/pkg/errors"
 )
 
 // Respond sends successful request processing response to the client
 func Respond(ctx context.Context, w http.ResponseWriter, data interface{}, statusCode int) error {
-	// start trace span
+	// start tracer span
+
+	// If the context is missing this value, request the service
+	// will be shutdown gracefully.
+	v, ok := ctx.Value(KeyValues).(*Values)
+	if !ok {
+		return errors.New("web value missing from context")
+	}
+
+	// Set the statusCode for the http request logger middleware.
+	v.StatusCode = statusCode
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {

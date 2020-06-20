@@ -8,7 +8,7 @@ import (
 )
 
 // Locate calculates complex maths
-func Locate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+func locate(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
 	// start trace span
 
 	data := CoordsVelocity{}

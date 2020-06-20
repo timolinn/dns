@@ -12,7 +12,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mattn/go-shellwords v1.0.10 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/satori/go.uuid v1.2.0 // indirect
+	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.6.0
 	gopkg.in/go-playground/validator.v9 v9.31.0
 	gopkg.in/urfave/cli.v1 v1.20.0 // indirect

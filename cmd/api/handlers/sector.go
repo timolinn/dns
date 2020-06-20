@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"math"
+	"net/http"
 )
 
 // SectorID is a unique identifier for different
@@ -72,4 +75,11 @@ func (sn *SectorNavigator) Response(data float64, systemType System) map[string]
 		resp["loc"] = data
 	}
 	return resp
+}
+
+func home(ctx context.Context, w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, fmt.Sprintf("Welcome to DNS on Sector %v", SectorID))
+	return nil
 }

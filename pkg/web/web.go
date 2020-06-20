@@ -1,3 +1,5 @@
+// Package web provides functions and concrete types
+// for configuring and instrumenting out web application
 package web
 
 import (
@@ -6,19 +8,33 @@ import (
 	"net/http"
 	"os"
 	"syscall"
+	"time"
 
 	"github.com/gorilla/mux"
 )
 
+type key int
+
+// KeyValues is how request values or stored/retrieved.
+const KeyValues key = 1
+
+// Values represent state for each request.
+type Values struct {
+	Now        time.Time
+	StatusCode int
+}
+
 // A Handler handles http requests
 type Handler func(ctx context.Context, w http.ResponseWriter, r *http.Request) error
 
+// App bootstraps the application, it's the entrypoint to our service
 type App struct {
 	*mux.Router
 	shutdown chan os.Signal
 	mw       []Middleware
 }
 
+// NewApp constructs an App
 func NewApp(shutdown chan os.Signal, mw ...Middleware) *App {
 	app := &App{
 		Router:   mux.NewRouter(),
@@ -33,13 +49,19 @@ func NewApp(shutdown chan os.Signal, mw ...Middleware) *App {
 func (a *App) MountHandler(verb, path string, handler Handler, mw ...Middleware) {
 	handler = wrapMiddleware(mw, handler)
 
-	// wrap app based middlewares
+	// wrap application level middlewares
 	handler = wrapMiddleware(a.mw, handler)
 
 	h := func(w http.ResponseWriter, r *http.Request) {
-		// start tracer span
+		// TODO: start tracer span
 
-		if err := handler(r.Context(), w, r); err != nil {
+		// add relevant values the context for propagation
+		v := Values{
+			Now: time.Now(),
+		}
+		ctx := context.WithValue(r.Context(), KeyValues, &v)
+
+		if err := handler(ctx, w, r); err != nil {
 			log.Println(err)
 			a.Shutdown()
 			return
