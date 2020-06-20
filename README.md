@@ -44,7 +44,15 @@ Building and running te production image is similar to development, run the foll
     $ docker build --rm -f ./build/Dockerfile.deploy -t dns-prod .
 ```
 
-This commands builds a smaller binary for our productin server
+This commands builds a smaller binary for our productin server.
+
+We can then run the image like this:
+
+```bash
+    $ docker run -it --rm -p 8080:8080 dns-prod
+```
+
+To run in deamon mode remove `-it` flag and add `-d`.
 
 ## API Reference
 
