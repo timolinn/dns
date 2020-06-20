@@ -18,7 +18,7 @@ There are two `Dockerfiles` in the build folder `Dockerfile.dev` and `Dockerfile
 
 #### Development
 
-You can run the development server using Docker which uses [github.com/codegangsta/gin](gin) to rebuild and restarts the DNS web server, gin relays requests to the DNS server via it's own proxy server that listens on port `3000`. To test this visit <localhost:3000>.
+You can run the development server using Docker which uses [github.com/codegangsta/gin](gin) to rebuild and restarts the DNS web server, gin relays requests to the DNS server via it's own proxy server that listens on port `3000`. To test this visit [localhost:3000](localhost:3000).
 
 To start the development server run the following commands.
 
@@ -38,7 +38,7 @@ This commands runs the `dns:latest` image that we built earlier. It also mounts 
 
 #### Production
 
-Building and running te production image is similar to development, run the following command to build hte production image:
+Building and running te production image is similar to development, run the following command to build the production image:
 
 ```bash
     $ docker build --rm -f ./build/Dockerfile.deploy -t dns-prod .
@@ -52,7 +52,7 @@ We can then run the image like this:
     $ docker run -it --rm -p 8080:8080 dns-prod
 ```
 
-To run in deamon mode remove `-it` flag and add `-d`.
+Visit [localhost:8080](localhost:8080) to test. To run in deamon mode remove the `-it` flag and replace it with `-d` flag.
 
 ## API Reference
 
