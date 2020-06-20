@@ -17,12 +17,13 @@ import (
 var version = "develop"
 
 var addr string
-var readtimeout, writetimeout time.Duration
+var readtimeout, writetimeout int
 
 func main() {
-	flag.StringVar(&addr, "host", ":8080", "define server address")
-	flag.DurationVar(&readtimeout, "read timeout", 5, "sets the read timeout in seconds")
-	flag.DurationVar(&writetimeout, "write timeout", 10, "sets the write timeout in seconds")
+
+	flag.StringVar(&addr, "addr", ":8080", "define server address")
+	flag.IntVar(&readtimeout, "readtimeout", 5, "sets the read timeout in seconds")
+	flag.IntVar(&writetimeout, "writetimeout", 10, "sets the write timeout in seconds")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "DNS : ", log.LstdFlags|log.Lmicroseconds|log.Lshortfile)
@@ -39,8 +40,8 @@ func run(logger *log.Logger) error {
 	server := &http.Server{
 		Addr:         addr,
 		Handler:      handlers.Register(shutdown, logger),
-		ReadTimeout:  readtimeout * time.Second,
-		WriteTimeout: writetimeout * time.Second,
+		ReadTimeout:  time.Duration(readtimeout) * time.Second,
+		WriteTimeout: time.Duration(writetimeout) * time.Second,
 		ErrorLog:     logger,
 	}
 
@@ -49,7 +50,7 @@ func run(logger *log.Logger) error {
 
 	// start our server
 	go func() {
-		log.Println("started running")
+		log.Printf("server listening on %v", server.Addr)
 		serverErr <- server.ListenAndServe()
 	}()
 

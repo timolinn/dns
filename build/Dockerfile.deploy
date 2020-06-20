@@ -19,9 +19,9 @@ WORKDIR $GOPATH/src/dns/
 COPY . .
 
 # Fetch dependencies.
-RUN go get -d -v ./api/cmd
+RUN go get -d -v ./cmd/api
 
-RUN GOOS=linux GOARCH=amd64 go build -addr=":8080" -readtimeout=5 -writetimeout=10 -ldflags="-w -s" -o /go/bin/dns ./api/cmd
+RUN GOOS=linux GOARCH=amd64 go build -o /go/bin/dns -ldflags="-w -s" ./cmd/api
 
 # STEP 2 build a small image
 FROM scratch

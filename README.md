@@ -16,6 +16,8 @@ This is my default way of running this program locally, so the rest of this docs
 
 There are two `Dockerfiles` in the build folder `Dockerfile.dev` and `Dockerfile.deploy`. The extension suggests their different use cases.
 
+#### Development
+
 You can run the development server using Docker which uses [github.com/codegangsta/gin](gin) to rebuild and restarts the DNS web server, gin relays requests to the DNS server via it's own proxy server that listens on port `3000`. To test this visit <localhost:3000>.
 
 To start the development server run the following commands.
@@ -33,6 +35,16 @@ To run it:
 ```
 
 This commands runs the `dns:latest` image that we built earlier. It also mounts the current working directly volume to the docker container, so that any change we make to our code is reflected within the container.
+
+#### Production
+
+Building and running te production image is similar to development, run the following command to build hte production image:
+
+```bash
+    $ docker build --rm -f ./build/Dockerfile.deploy -t dns-prod .
+```
+
+This commands builds a smaller binary for our productin server
 
 ## API Reference
 
@@ -57,6 +69,7 @@ This is a relatively small API, so achieving a 100% test coverage was easy.
 
 + [ ] Add intgrate tracing capability with Jeager
 + [ ] Write build script or Makefile
++ [ ] Configure CI/CD
 
 ## Copyright © All rights reserved.
 
