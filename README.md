@@ -75,10 +75,10 @@ This is a relatively small API, so achieving a 100% test coverage was easy.
 
 ## TODO
 
-+ [ ] Add intgrate tracing capability with Jeager
++ [ ] Intgrate tracing capability with Jeager
 + [ ] Write build script or Makefile
 + [ ] Configure CI/CD
 
-## Copyright © All rights reserved.
+## Copyright © All rights reserved
 
 **Atlas Corporation.**
